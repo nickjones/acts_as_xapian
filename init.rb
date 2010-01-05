@@ -7,6 +7,9 @@
 
 require 'acts_as_xapian'
 require 'acts_as_xapian/query_base'
+require 'acts_as_xapian/index'
+require 'acts_as_xapian/readable_index'
+require 'acts_as_xapian/writeable_index'
 require 'acts_as_xapian/search'
 require 'acts_as_xapian/similar'
 require 'acts_as_xapian/core_ext/array'
