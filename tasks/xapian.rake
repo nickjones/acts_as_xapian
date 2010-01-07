@@ -10,6 +10,8 @@ namespace :xapian do
     # "verbose=true" to print model name as it is run.
     desc 'Updates Xapian search index with changes to models since last call'
     task (:update_index => :environment) do
+	# XXX We break the thread safety enforced by the environment since this code (hopefully) is mindful of the exposure.
+	ActiveSupport::Dependencies.hook!
         ActsAsXapian::WriteableIndex.update_index(ENV['flush'] ? true : false, ENV['verbose'] ? true : false)
     end
 
@@ -22,6 +24,8 @@ namespace :xapian do
     desc 'Completely rebuilds Xapian search index (must specify all models)'
     task (:rebuild_index => :environment) do
         raise "specify ALL your models with models=\"ModelName1 ModelName2\" as parameter" if ENV['models'].nil?
+	# XXX We break the thread safety enforced by the environment since this code (hopefully) is mindful of the exposure.
+	ActiveSupport::Dependencies.hook!
         ActsAsXapian::WriteableIndex.rebuild_index(ENV['models'].split(" ").map{|m| m.constantize}, ENV['verbose'] ? true : false)
     end
 
