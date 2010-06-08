@@ -1,3 +1,7 @@
+# encoding: utf-8
+# Copyright (c) 2009 Symétrie (http://symetrie.com)
+# Written by Thomas Chambon
+
 module ActsAsXapian
   module Fuzzy_Date
     class FuzzyDateMatchDecider < Xapian::MatchDecider
