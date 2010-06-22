@@ -51,7 +51,12 @@ module ActsAsXapian
         # we have the info from acts_as_xapian.
         model_classes = ActsAsXapianJob.find(:all, :select => 'model', :group => 'model').map {|a| a.model.constantize }
         # If there are no models in the queue, then nothing to do
-        return if model_classes.empty?
+        if model_classes.empty?
+          prepare_environment
+          writable_db = Xapian::WritableDatabase.new(@@db_path, Xapian::DB_CREATE_OR_OPEN)
+          writable_db.set_metadata("last_indexation", DateTime.now.to_s)
+          return
+        end
 
         self.writable_init
 
@@ -91,6 +96,8 @@ module ActsAsXapian
             STDERR.puts("#{detail.backtrace.join("\n")}\nFAILED ActsAsXapian::WriteableIndex.update_index job #{id} #{$!}")
           end
         end
+
+        @@writable_db.set_metadata("last_indexation", DateTime.now.to_s)
       end
 
       # You must specify *all* the models here, this totally rebuilds the Xapian database.
@@ -123,6 +130,9 @@ module ActsAsXapian
             end
           end
         end
+
+        # Update indexation timestamp
+        @@writable_db.set_metadata("last_indexation", DateTime.now.to_s)
 
         @@writable_db.flush
 
