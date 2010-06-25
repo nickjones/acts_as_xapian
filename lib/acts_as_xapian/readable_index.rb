@@ -26,7 +26,8 @@ module ActsAsXapian
     def self.last_indexation
       self.prepare_environment
       db = Xapian::Database.new(@@db_path)
-      DateTime.parse db.get_metadata("last_indexation")
+      ind_time = db.get_metadata("last_indexation")
+      (ind_time != "") ? DateTime.parse(ind_time) : DateTime.new(0)
     end
 
     # Opens the db for reading and builds the query parser
