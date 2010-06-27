@@ -27,7 +27,7 @@ module ActsAsXapian
     # - :sort_by_ascending - determines which direction to sort. default: true (ascending sort)
     # - :collapse_by_prefix - groups the return set by this prefix
     # - :find_options - These options are passed through to the active record find. Be careful if searching against multiple model classes.
-    def initialize(model_classes, query_string, options = {})
+    def initialize(model_classes, query_string = nil, options = {})
       # Check parameters, convert to actual array of model classes
       model_classes = Array(model_classes).map do |model_class|
         model_class = model_class.constantize if model_class.instance_of?(String)
@@ -43,8 +43,12 @@ module ActsAsXapian
 
       # Construct query which only finds things from specified models
       model_query = Xapian::Query.new(Xapian::Query::OP_OR, model_classes.map {|mc| "M#{mc}" })
-      user_query = @index.query_parser.parse_query(self.query_string, @@parse_query_flags)
-      self.query = Xapian::Query.new(Xapian::Query::OP_AND, model_query, user_query)
+      self.query = if query_string
+                     user_query = @index.query_parser.parse_query(self.query_string, @@parse_query_flags)
+                     Xapian::Query.new(Xapian::Query::OP_AND, model_query, user_query)
+                   else
+                     model_query
+                   end
 
       # Call base class constructor
       self.initialize_query(options)
@@ -54,14 +58,14 @@ module ActsAsXapian
     # date ranges or similar. Use this for cheap highlighting with
     # TextHelper::highlight, and excerpt.
     def words_to_highlight
-      query_nopunc = self.query_string.gsub(/[^\w:\.\/_]/i, " ").gsub(/\s+/, " ")
+      query_nopunc = self.query_string.to_s.gsub(/[^\w:\.\/_]/i, " ").gsub(/\s+/, " ")
       # Split on ' ' and remove anything with a :, . or / in it or boolean operators
       query_nopunc.split(" ").reject {|o| o.match(/(:|\.|\/)|^(AND|NOT|OR|XOR)$/) }
     end
 
     # Text for lines in log file
     def log_description
-      "Search: #{self.query_string}"
+      "Search: #{self.query_string.to_s}"
     end
   end
 end

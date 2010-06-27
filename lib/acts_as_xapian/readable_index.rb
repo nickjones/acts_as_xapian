@@ -22,6 +22,14 @@ module ActsAsXapian
       end
     end
 
+    # Get date & time of last indexation
+    def self.last_indexation
+      self.prepare_environment
+      db = Xapian::Database.new(@@db_path)
+      ind_time = db.get_metadata("last_indexation")
+      (ind_time != "") ? DateTime.parse(ind_time) : DateTime.new(0)
+    end
+
     # Opens the db for reading and builds the query parser
     def initialize(models)
       raise NoXapianRubyBindingsError.new("Xapian Ruby bindings not installed") unless ActsAsXapian.bindings_available
