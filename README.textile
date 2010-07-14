@@ -41,7 +41,7 @@ b. Installation
 Retrieve the plugin directly from the git version control system by running
 this command within your Rails app.
 
-    git clone git://github.com/frabcus/acts_as_xapian.git vendor/plugins/acts_as_xapian
+    git clone git://github.com/xspond/acts_as_xapian.git vendor/plugins/acts_as_xapian
 
 Xapian 1.0.5 and associated Ruby bindings are also required. 
 

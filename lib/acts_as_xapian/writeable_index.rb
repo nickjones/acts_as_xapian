@@ -64,7 +64,7 @@ module ActsAsXapian
         ids_to_refresh.each do |id|
           begin
             ActsAsXapianJob.transaction do
-              job = ActsAsXapianJob.find(id, :lock =>true)
+              job = ActsAsXapianJob.find(id)
               puts "ActsAsXapian::WriteableIndex.update_index #{job.action} #{job.model} #{job.model_id.to_s}" if verbose
               begin
                 case job.action
